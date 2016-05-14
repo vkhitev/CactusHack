@@ -1,23 +1,27 @@
 package com.example.sandbox;
 
-import java.io.File;
+import android.graphics.Path;
 
 /**
  * Created by glebl_000 on 5/14/2016.
  */
+enum request{SEND, GET, SEND_INFO, GET_INFO};
+
 public class Task {
     private int localId;
     private int globalId;
     private String name;
     private String macAddress;
     private SharingFile file;
-    public enum request{SEND, GET};
+    public request requestType;
+
 
     public Task(int globalId, String name, String macAddress, SharingFile file, request requestType){
         this.globalId = globalId;
         this.name = name;
         this.macAddress = macAddress;
         this.file = file;
+        this.requestType = requestType;
     }
 
     public int getLocalId() {
@@ -59,5 +63,7 @@ public class Task {
     public void setFile(SharingFile file) {
         this.file = file;
     }
+
+
 
 }
