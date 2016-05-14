@@ -11,8 +11,9 @@ public class Task {
     private String name;
     private String macAddress;
     private SharingFile file;
+    public enum request{SEND, GET};
 
-    public Task(int globalId, String name, String macAddress, SharingFile file){
+    public Task(int globalId, String name, String macAddress, SharingFile file, request requestType){
         this.globalId = globalId;
         this.name = name;
         this.macAddress = macAddress;
@@ -58,7 +59,5 @@ public class Task {
     public void setFile(SharingFile file) {
         this.file = file;
     }
-
-    private enum request{SEND, GET};
 
 }
