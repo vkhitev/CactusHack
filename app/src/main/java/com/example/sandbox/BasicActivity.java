@@ -28,6 +28,7 @@ public class BasicActivity extends AppCompatActivity {
 
     Button buttonOpenDialog;
     Button seeLocalFiles;
+    Button seeGlobalFiles;
     Button buttonUp;
     TextView textFolder;
 
@@ -71,8 +72,16 @@ public class BasicActivity extends AppCompatActivity {
             public void onClick(View v) {
                 populateListView();
 
-                TextView textView = (TextView)findViewById(R.id.filesAmount);
-                textView.setText(filesList.size() + "");
+//                TextView textView = (TextView)findViewById(R.id.filesAmount);
+//                textView.setText(filesList.size() + "");
+            }
+        });
+
+        seeGlobalFiles = (Button)findViewById(R.id.seeGlobalFiles);
+        seeGlobalFiles.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                populateGlobalListView();
             }
         });
 
@@ -116,6 +125,21 @@ public class BasicActivity extends AppCompatActivity {
         String strs[] = new String[filesNames.size()];
         strs = filesNames.toArray(strs);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.filelists1, strs);
+        ListView list = (ListView)findViewById(R.id.listView);
+        list.setAdapter(adapter);
+    }
+
+    public void populateGlobalListView(){
+        ArrayList<String> filesNames = new ArrayList<>();
+        for (int i = 1; i <= filesList.size(); i++) {
+            if(!filesList.get(i).isLocal())
+                filesNames.add(filesList.get(i).getFileLocation());
+        }
+        filesNames.add("remoteFile");
+
+        String strs[] = new String[filesNames.size()];
+        strs = filesNames.toArray(strs);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.globalfiles, strs);
         ListView list = (ListView)findViewById(R.id.listView1);
         list.setAdapter(adapter);
     }

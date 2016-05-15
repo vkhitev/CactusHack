@@ -23,4 +23,8 @@ public class SharingFile {
     public String getFileLocation() {
         return fileLocation;
     }
+
+    public boolean isLocal() {
+        return isLocal;
+    }
 }
