@@ -1,9 +1,11 @@
 package com.example.sandbox;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -26,8 +28,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class BasicActivity extends AppCompatActivity {
 
     private String workingDirectory;
-    private LinkedBlockingQueue<Task> commonPull = new LinkedBlockingQueue<>();;
     private Map<Integer, SharingFile> filesList = new HashMap<>();
+
+    // ИСПОЛЬБЗОВАТЬ ТОЛЬКО ОДИН
+    private SocketClient client = null;
+    private SocketServer server = null;
 
     Button buttonOpenDialog;
     Button seeLocalFiles;
@@ -45,15 +50,23 @@ public class BasicActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_basic);
-        //List<File> files = getListFiles(new File(Environment.getExternalStorageDirectory().toString() + "/1"));
+
+        Intent intent = getIntent();
+        String ip = intent.getStringExtra("ip");
+        Integer port = intent.getIntExtra("port", 8787);
 
         TextView textViewIp = (TextView) findViewById(R.id.textViewIp);
-        if(MainActivity.client.isServer()){
+
+        // IF SERVER
+        if(!MainActivity.isClient){
             assert textViewIp != null;
+            server = new SocketServer(8787);
             textViewIp.setText("Your IP : " + getIpAddress());
-        }else{
+        } else { // IF CLIENT
             assert textViewIp != null;
             textViewIp.setText("");
+            Log.i("Client", "Try connect");
+            client = new SocketClient(ip, 8787, filesList);
         }
 
         buttonOpenDialog = (Button) findViewById(R.id.opendialog);
@@ -76,6 +89,12 @@ public class BasicActivity extends AppCompatActivity {
         seeGlobalFiles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (client != null) {
+                    client.askSyncOfAllFilesRequest();
+                } else {
+//                    Возможно, локальные устройства сами отсылают.
+//                    server.askSyncOfAllFilesRequest();
+                }
                 populateGlobalListView();
             }
         });
@@ -83,39 +102,10 @@ public class BasicActivity extends AppCompatActivity {
         root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
         curFolder = root;
 
-        Thread thread = new Thread(MainActivity.client);
-        MainActivity.client.pull = commonPull;
-        MainActivity.client.filesList = filesList;
-        thread.start();
-        //thread.start();
-
-        //EditText editText = (EditText)findViewById(R.id.editText1);
-
-
-        //TextView textView = (TextView)findViewById(R.id.textView);
-        //textView.setText(str);
-
-//        //initialize global files list on all device
-//        for(Map.Entry<Integer, User> entry : usersList.entrySet()) {
-//            Integer key = entry.getKey();
-//            usersList.get(key);
-//            // do what you have to do here
-//            // In your case, an other loop.
-//        }
-//
-////        Thread thread = new Thread(new PullThread(commonPull, filesList, usersList));
-////        thread.start();
-//
-//        Button btn = (Button)findViewById(R.id.button1);
-//        btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                EditText editText = (EditText)findViewById(R.id.editText1);
-//                TextView textView = (TextView)findViewById(R.id.textView);
-//                textView.setText(Environment.getDataDirectory().toString());
-//                List<File> files = getListFiles(new File("/1"));
-//            }
-//        });
+//        Thread thread = new Thread(MainActivity.client);
+//        MainActivity.client.pull = commonPull;
+//        MainActivity.client.filesList = filesList;
+//        thread.start();
     }
 
     public void populateListView(){
@@ -136,7 +126,7 @@ public class BasicActivity extends AppCompatActivity {
             if(!filesList.get(i).isLocal())
                 filesNames.add(filesList.get(i).getFileLocation());
         }
-        filesNames.add("remoteFile");
+        filesNames.add("remoteFile");// FOR TEST
 
         String strs[] = new String[filesNames.size()];
         strs = filesNames.toArray(strs);
@@ -152,7 +142,10 @@ public class BasicActivity extends AppCompatActivity {
                 for (Map.Entry<Integer, SharingFile> entry : filesList.entrySet()) {
                     if (entry.getValue().equals(chosenConnection)) {
                         System.out.println(entry.getKey() + "/" + entry.getValue());
-                        commonPull.add(new Task(entry.getKey(), request.GET));
+//                        commonPull.add(new Task(entry.getKey(), request.DOWNLOAD_FILE));
+                        if (client != null) {
+                            client.downloadFileRequest(entry.getKey());
+                        }
                         break;
                     }
                 }
@@ -193,7 +186,10 @@ public class BasicActivity extends AppCompatActivity {
                             SharingFile.idCounter++;
                             SharingFile currentFile = new SharingFile(SharingFile.idCounter, selected.getAbsolutePath(), true);
                             filesList.put(SharingFile.idCounter, currentFile);
-                            commonPull.add(new Task(currentFile.getFileLocation(), request.SEND_INFO));
+//                            commonPull.add(new Task(currentFile.getFileLocation(), request.FILE_ADDED_TO_LOCAL_FOLDER));
+                            if (client != null) {
+                                client.fileAddedToLocalRequest(currentFile.getFileLocation());
+                            }
                             Toast.makeText(BasicActivity.this, selected.toString() + " selected",
                                     Toast.LENGTH_LONG).show();
                             dismissDialog(CUSTOM_DIALOG_ID);
