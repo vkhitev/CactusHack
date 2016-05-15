@@ -193,12 +193,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    //check for correct IP
     private boolean isEmailValid(String ip) {
         //TODO: Replace this with your own logic
         MainActivity.client.setIP(ip);
         return true;
     }
 
+    //check for correct PORT
     private boolean isPasswordValid(String port) {
         //TODO: Replace this with your own logic
         MainActivity.client.setPORT(port);

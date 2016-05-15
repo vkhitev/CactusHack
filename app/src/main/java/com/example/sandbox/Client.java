@@ -21,6 +21,7 @@ public class Client implements Runnable {
     private String IP;
     private String PORT;
     private Map<Integer, SharingFile> localFiles;
+    private boolean isServer = false;
 
     public LinkedBlockingQueue<Task> pull;
     public Map<Integer, SharingFile> filesList;
@@ -49,8 +50,6 @@ public class Client implements Runnable {
                         break;
                     case GET_INFO:
                         break;
-
-
                 }
 
             } catch (InterruptedException e) {
@@ -152,5 +151,13 @@ public class Client implements Runnable {
 
     public void setIP(String IP) {
         this.IP = IP;
+    }
+
+    public void setServer(boolean server) {
+        isServer = server;
+    }
+
+    public boolean isServer() {
+        return isServer;
     }
 }

@@ -13,7 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +46,15 @@ public class BasicActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_basic);
         //List<File> files = getListFiles(new File(Environment.getExternalStorageDirectory().toString() + "/1"));
+
+        TextView textViewIp = (TextView) findViewById(R.id.textViewIp);
+        if(MainActivity.client.isServer()){
+            assert textViewIp != null;
+            textViewIp.setText("Your IP : " + getIpAddress());
+        }else{
+            assert textViewIp != null;
+            textViewIp.setText("");
+        }
 
         buttonOpenDialog = (Button) findViewById(R.id.opendialog);
         buttonOpenDialog.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +117,7 @@ public class BasicActivity extends AppCompatActivity {
 //            }
 //        });
     }
-    
+
     public void populateListView(){
         ArrayList<String> filesNames = new ArrayList<>();
         for (int i = 1; i <= filesList.size(); i++) {
@@ -128,23 +141,24 @@ public class BasicActivity extends AppCompatActivity {
         String strs[] = new String[filesNames.size()];
         strs = filesNames.toArray(strs);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.globalfiles, strs);
+
+
         final ListView list = (ListView)findViewById(R.id.listView1);
         list.setAdapter(adapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String chosenConnection = (String) list.getItemAtPosition(position);
-                for (int i = 1; i < filesList.size(); i++) {
-                    if (filesList.get(i).getFileLocation().equals(chosenConnection)){
-                        commonPull.add(new Task(i, request.GET));
+                for (Map.Entry<Integer, SharingFile> entry : filesList.entrySet()) {
+                    if (entry.getValue().equals(chosenConnection)) {
+                        System.out.println(entry.getKey() + "/" + entry.getValue());
+                        commonPull.add(new Task(entry.getKey(), request.GET));
                         break;
                     }
                 }
             }
         });
     }
-
-
 
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -235,5 +249,35 @@ public class BasicActivity extends AppCompatActivity {
             SharingFile currentFile = new SharingFile(SharingFile.idCounter, file.getAbsolutePath(), true);
         }
         return inFiles;
+    }
+
+    private String getIpAddress() {
+        String ip = "";
+        try {
+            Enumeration<NetworkInterface> enumNetworkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (enumNetworkInterfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = enumNetworkInterfaces
+                        .nextElement();
+                Enumeration<InetAddress> enumInetAddress = networkInterface
+                        .getInetAddresses();
+                while (enumInetAddress.hasMoreElements()) {
+                    InetAddress inetAddress = enumInetAddress.nextElement();
+
+                    if (inetAddress.isSiteLocalAddress()) {
+                        ip += "SiteLocalAddress: "
+                                + inetAddress.getHostAddress() + "\n";
+                    }
+
+                }
+
+            }
+
+        } catch (SocketException e) {
+// TODO Auto-generated catch block
+            e.printStackTrace();
+            ip += "Something Wrong! " + e.toString() + "\n";
+        }
+
+        return ip;
     }
 }
