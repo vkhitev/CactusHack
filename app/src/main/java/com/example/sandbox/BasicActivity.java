@@ -104,8 +104,7 @@ public class BasicActivity extends AppCompatActivity {
 //            }
 //        });
     }
-
-
+    
     public void populateListView(){
         ArrayList<String> filesNames = new ArrayList<>();
         for (int i = 1; i <= filesList.size(); i++) {
@@ -119,7 +118,7 @@ public class BasicActivity extends AppCompatActivity {
     }
 
     public void populateGlobalListView(){
-        ArrayList<String> filesNames = new ArrayList<>();
+        final ArrayList<String> filesNames = new ArrayList<>();
         for (int i = 1; i <= filesList.size(); i++) {
             if(!filesList.get(i).isLocal())
                 filesNames.add(filesList.get(i).getFileLocation());
@@ -129,8 +128,20 @@ public class BasicActivity extends AppCompatActivity {
         String strs[] = new String[filesNames.size()];
         strs = filesNames.toArray(strs);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.globalfiles, strs);
-        ListView list = (ListView)findViewById(R.id.listView1);
+        final ListView list = (ListView)findViewById(R.id.listView1);
         list.setAdapter(adapter);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String chosenConnection = (String) list.getItemAtPosition(position);
+                for (int i = 1; i < filesList.size(); i++) {
+                    if (filesList.get(i).getFileLocation().equals(chosenConnection)){
+                        commonPull.add(new Task(i, request.GET));
+                        break;
+                    }
+                }
+            }
+        });
     }
 
 
@@ -168,6 +179,7 @@ public class BasicActivity extends AppCompatActivity {
                             SharingFile.idCounter++;
                             SharingFile currentFile = new SharingFile(SharingFile.idCounter, selected.getAbsolutePath(), true);
                             filesList.put(SharingFile.idCounter, currentFile);
+                            commonPull.add(new Task(currentFile.getFileLocation(), request.SEND_INFO));
                             Toast.makeText(BasicActivity.this, selected.toString() + " selected",
                                     Toast.LENGTH_LONG).show();
                             dismissDialog(CUSTOM_DIALOG_ID);

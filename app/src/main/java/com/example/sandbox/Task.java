@@ -2,6 +2,8 @@ package com.example.sandbox;
 
 import android.graphics.Path;
 
+import java.io.File;
+
 /**
  * Created by glebl_000 on 5/14/2016.
  */
@@ -11,17 +13,42 @@ public class Task {
     private int localId;
     private int globalId;
     private String name;
+    private String filePath;
     private String macAddress;
     private SharingFile file;
     public request requestType;
+    private File fileToSend;
 
 
-    public Task(int globalId, String name, String macAddress, SharingFile file, request requestType){
+//    public Task(int globalId, String name, String macAddress, SharingFile file, request requestType){
+//        this.globalId = globalId;
+//        this.name = name;
+//        this.macAddress = macAddress;
+//        this.file = file;
+//        this.requestType = requestType;
+//    }
+
+    //send file
+    public Task(File fileToSend, request request){
+        this.fileToSend = fileToSend;
+        this.requestType = request;
+    }
+
+    //send info about file
+    public Task(String filePath, request request){
+        this.filePath = filePath;
+        this.requestType = request;
+    }
+
+    //get files
+    public Task(int globalId, request request){
         this.globalId = globalId;
-        this.name = name;
-        this.macAddress = macAddress;
-        this.file = file;
-        this.requestType = requestType;
+        this.requestType = request;
+    }
+
+    //get info about files
+    public Task(request request){
+        this.requestType = request;
     }
 
     public int getLocalId() {

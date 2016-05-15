@@ -25,8 +25,6 @@ public class Client implements Runnable {
     public LinkedBlockingQueue<Task> pull;
     public Map<Integer, SharingFile> filesList;
 
-
-
     @Override
     public void run() {
         while (true) {
@@ -34,15 +32,20 @@ public class Client implements Runnable {
                 Task currentTask = pull.take();
                 switch (currentTask.requestType) {
                     case GET:
-                        Task task = new Task(currentTask.getGlobalId(), currentTask.getName(), currentTask.getMacAddress(),
-                                filesList.get(currentTask.getGlobalId()), request.SEND);
+//                        Task task = new Task(currentTask.getGlobalId(), currentTask.getName(), currentTask.getMacAddress(),
+//                                filesList.get(currentTask.getGlobalId()), request.SEND);
+
+
+//                        currentTask.sendKhityov();
                         //send to socetbrea;
                         break;
                     case SEND:
-                        filesList.put(currentTask.getGlobalId(), currentTask.getFile());
-                        //todo
+//                        filesList.put(currentTask.getGlobalId(), currentTask.getFile());
+//                        File takenFile = KhitovSendFile();
                         break;
                     case SEND_INFO:
+//                        currentTask.sendKhitov();
+                        //send Khityov
                         break;
                     case GET_INFO:
                         break;
@@ -91,22 +94,22 @@ public class Client implements Runnable {
     }
 
     //query to server to getFiles
-    public void getRemoteFilesInfo() {
-        sendTask(new Task(0, name, macAddress, null, request.GET));
-        localFiles.put(0, waitingForFileInfo());
-    }
+//    public void getRemoteFilesInfo() {
+//        sendTask(new Task(0, name, macAddress, null, request.GET));
+//        localFiles.put(0, waitingForFileInfo());
+//    }
 
-    public void getRemoteFile(Integer remoteFileId) {
-        sendTask(new Task(remoteFileId, name, macAddress, null, request.GET));
-        localFiles.put(0, waitingForFile());
-    }
+//    public void getRemoteFile(Integer remoteFileId) {
+//        sendTask(new Task(remoteFileId, name, macAddress, null, request.GET));
+//        localFiles.put(0, waitingForFile());
+//    }
 
-    public void getRemoteFiles() {
-        for (int remoteFileId = 0; remoteFileId < remoteFiles.size(); remoteFileId++) {
-            sendTask(new Task(remoteFileId, name, macAddress, null, request.GET));
-            localFiles.put(0, waitingForFile());
-        }
-    }
+//    public void getRemoteFiles() {
+//        for (int remoteFileId = 0; remoteFileId < remoteFiles.size(); remoteFileId++) {
+//            sendTask(new Task(remoteFileId, name, macAddress, null, request.GET));
+//            localFiles.put(0, waitingForFile());
+//        }
+//    }
 
     //TODO: create thread to read information about files
     public SharingFile waitingForFileInfo() {
@@ -120,15 +123,15 @@ public class Client implements Runnable {
         return null;
     }
 
-    public void sendInfoAboutLocalFiles() {
-        for (int i = 0; i < localFiles.size(); i++)
-            sendTask(new Task(0, name, macAddress, localFiles.get(i), request.SEND));
-    }
+//    public void sendInfoAboutLocalFiles() {
+//        for (int i = 0; i < localFiles.size(); i++)
+//            sendTask(new Task(0, name, macAddress, localFiles.get(i), request.SEND));
+//    }
 
-    public void sendInfoAboutLocalFile(Integer idFileToSend) {
-//        sendTask(new Task(0, name, macAddress, localFiles.get(idFileToSend), Task.request.SEND));
-        sendTask(new Task(0, name, macAddress, localFiles.get(idFileToSend), request.SEND_INFO));
-    }
+//    public void sendInfoAboutLocalFile(Integer idFileToSend) {
+////        sendTask(new Task(0, name, macAddress, localFiles.get(idFileToSend), Task.request.SEND));
+//        sendTask(new Task(0, name, macAddress, localFiles.get(idFileToSend), request.SEND_INFO));
+//    }
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public void sendTask(Task send) {
