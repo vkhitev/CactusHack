@@ -24,33 +24,18 @@ public class BasicActivity extends AppCompatActivity {
     private String workingDirectory;
     private LinkedBlockingQueue<Task> commonPull = new LinkedBlockingQueue<>();;
     private Map<Integer, SharingFile> filesList = new HashMap<>();
-    private Map<Integer, User> usersList = new HashMap<>();
 
     Button buttonOpenDialog;
     Button seeLocalFiles;
     Button seeGlobalFiles;
     Button buttonUp;
     TextView textFolder;
-
     String KEY_TEXTPSS = "TEXTPSS";
     static final int CUSTOM_DIALOG_ID = 0;
     ListView dialog_ListView;
-
     File root;
     File curFolder;
-
     private List<String> fileList = new ArrayList<String>();
-
-    private List<File> getListFiles(File parentDir) {
-        String str = "";
-        ArrayList<File> inFiles = new ArrayList<File>();
-        File[] files = parentDir.listFiles();
-        for (File file : files) {
-            SharingFile.idCounter++;
-            SharingFile currentFile = new SharingFile(SharingFile.idCounter, file.getAbsolutePath(), true);
-        }
-        return inFiles;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +56,6 @@ public class BasicActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 populateListView();
-
-//                TextView textView = (TextView)findViewById(R.id.filesAmount);
-//                textView.setText(filesList.size() + "");
             }
         });
 
@@ -87,6 +69,12 @@ public class BasicActivity extends AppCompatActivity {
 
         root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
         curFolder = root;
+
+        Thread thread = new Thread(MainActivity.client);
+        MainActivity.client.pull = commonPull;
+        MainActivity.client.filesList = filesList;
+        thread.start();
+        //thread.start();
 
         //EditText editText = (EditText)findViewById(R.id.editText1);
 
@@ -117,6 +105,7 @@ public class BasicActivity extends AppCompatActivity {
 //        });
     }
 
+
     public void populateListView(){
         ArrayList<String> filesNames = new ArrayList<>();
         for (int i = 1; i <= filesList.size(); i++) {
@@ -143,6 +132,8 @@ public class BasicActivity extends AppCompatActivity {
         ListView list = (ListView)findViewById(R.id.listView1);
         list.setAdapter(adapter);
     }
+
+
 
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -219,5 +210,18 @@ public class BasicActivity extends AppCompatActivity {
         ArrayAdapter<String> directoryList = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, fileList);
         dialog_ListView.setAdapter(directoryList);
+    }
+
+
+
+    private List<File> getListFiles(File parentDir) {
+        String str = "";
+        ArrayList<File> inFiles = new ArrayList<File>();
+        File[] files = parentDir.listFiles();
+        for (File file : files) {
+            SharingFile.idCounter++;
+            SharingFile currentFile = new SharingFile(SharingFile.idCounter, file.getAbsolutePath(), true);
+        }
+        return inFiles;
     }
 }

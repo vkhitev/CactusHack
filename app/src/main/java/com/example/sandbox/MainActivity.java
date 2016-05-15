@@ -14,7 +14,7 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 
-    Client client;
+    public static Client client = new Client();
     ArrayAdapter<String> adapter;
     ListView listView;
 
@@ -25,7 +25,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        client = new Client();
         File directory = new File(Environment.getExternalStorageDirectory().toString() + "/SandBox");
 
         if(!directory.exists()) {

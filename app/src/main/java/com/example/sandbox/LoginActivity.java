@@ -40,8 +40,6 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    Client client = new Client();
-
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -197,13 +195,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String ip) {
         //TODO: Replace this with your own logic
-        client.setIP(ip);
+        MainActivity.client.setIP(ip);
         return true;
     }
 
     private boolean isPasswordValid(String port) {
         //TODO: Replace this with your own logic
-        client.setPORT(port);
+        MainActivity.client.setPORT(port);
         return true;
     }
 
